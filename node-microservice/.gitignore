@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.log
+.env
+coverage/
+*.js
+*.js.map
+!jest.config.js

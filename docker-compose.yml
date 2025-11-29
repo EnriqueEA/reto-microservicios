@@ -1,0 +1,38 @@
+services:
+  node:
+    build: ./node-microservice
+    container_name: node-stats-api
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - microservices-network
+
+  go:
+    build: ./go-microservice
+    container_name: go-qr-api
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - NODE_SERVICE_URL=http://node:3000
+      - JWT_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjQ3NDQ2MzEsImV4cCI6MTc2NDgzMTAzMX0.TPkIBXgqRM4bsnR7IJ7PtkQ-WvrtxVjmWavzb1U199I
+    depends_on:
+      - node
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
